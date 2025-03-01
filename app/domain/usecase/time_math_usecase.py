@@ -28,8 +28,8 @@ class TimeMathUsecase:
         v_1_ms = time_comparision.v_1 * 1000.0 / 3600.0
         v_2_ms = time_comparision.v_2 * 1000.0 / 3600.0
 
-        # Tiempo de referencia (ejemplo: 1 hora en el marco inercial)
-        t_ref = 3600.0  # 1 hora en segundos
+        # Tiempo de referencia 
+        t_ref = time_comparision.t_ref  # en segundos
 
         # Calcular tiempos propios
         gamma_1 = self.calculate_time_dilation(v_1_ms)

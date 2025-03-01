@@ -6,6 +6,7 @@ class TimeComparision(BaseModel):
     is_logged: bool 
     v_1: int
     v_2: int
+    t_ref: int
     
 class TimeComparisionResult(BaseModel):
     t_1: float

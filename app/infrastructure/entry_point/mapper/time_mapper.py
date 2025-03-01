@@ -9,7 +9,8 @@ class TimeMapper():
             user_id=new_time_comparision_input.user_id if new_time_comparision_input.user_id else None,
             is_logged=new_time_comparision_input.is_logged,
             v_1=new_time_comparision_input.v_1,
-            v_2=new_time_comparision_input.v_2
+            v_2=new_time_comparision_input.v_2,
+            t_ref=new_time_comparision_input.t_ref
         )
     
     @staticmethod
