@@ -32,7 +32,7 @@ router = APIRouter(
     }
 )
 @inject
-async def create_user(
+def create_user(
     user_dto: NewUserInput,
     user_usecase: UserUseCase = Depends(Provide[Container.user_usecase])
 ):
@@ -57,7 +57,7 @@ async def create_user(
     user = user_mapper.map_user_dto_to_user(user_dto)
 
     try:
-        user = await user_usecase.create_user(user)
+        user = user_usecase.create_user(user)
         response_data = user_mapper.map_user_to_user_output_dto(user)
         return ApiResponse.create_response(ResponseCodeEnum.KO000, response_data)
     except CustomException as e:
@@ -80,7 +80,7 @@ async def create_user(
     }
 )
 @inject
-async def get_user(
+def get_user(
     get_user_dto: GetUser,
     user_usecase: UserUseCase = Depends(Provide(Container.user_usecase)),
     current_user: str = Depends(get_current_user)
@@ -105,7 +105,7 @@ async def get_user(
     user = user_mapper.map_get_user_dto_to_user(get_user_dto)
 
     try:
-        user = await user_usecase.get_user(user)
+        user =  user_usecase.get_user(user)
         response_data = user_mapper.map_user_to_user_output_dto(user)
         return ApiResponse.create_response(ResponseCodeEnum.KO000, response_data)
     except CustomException as e:
@@ -125,7 +125,7 @@ async def get_user(
     }
 )
 @inject
-async def login(
+def login(
     login_dto: LoginInput,
     auth_usecase: AuthUseCase = Depends(Provide[Container.auth_usecase])
 ):
@@ -149,7 +149,7 @@ async def login(
     user = user_mapper.map_login_dto_to_user(login_dto)
     
     try:
-        token = await auth_usecase.authenticate_user(user)
+        token =  auth_usecase.authenticate_user(user)
         if token:
             token = Token(access_token=token, token_type="bearer")
             return ApiResponse.create_response(ResponseCodeEnum.KO000, token)
@@ -172,7 +172,7 @@ async def login(
     }
 )  
 @inject
-async def update_user(
+def update_user(
     update_user_dto: UpdateUserInput,
     user_usecase: UserUseCase = Depends(Provide(Container.user_usecase)),
     current_user: str = Depends(get_current_user)
@@ -199,7 +199,7 @@ async def update_user(
     user = user_mapper.map_update_user_dto_to_user(update_user_dto)
 
     try:
-        user = await user_usecase.update_user(user)
+        user =  user_usecase.update_user(user)
         response_data = user_mapper.map_user_to_user_output_dto(user)
         return ApiResponse.create_response(ResponseCodeEnum.KO000, response_data)
     except CustomException as e:

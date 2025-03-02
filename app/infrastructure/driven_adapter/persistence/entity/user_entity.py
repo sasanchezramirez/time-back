@@ -4,6 +4,8 @@ from app.infrastructure.driven_adapter.persistence.config.database import Base
 
 class User_entity(Base):
     __tablename__ = "users"
+    __table_args__ = {"schema": "relativistic_time_calculator"} 
+
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
