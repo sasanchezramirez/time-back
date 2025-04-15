@@ -1,54 +1,169 @@
-# Hexagonal Architecture Archetype with FastAPI
 
-This project provides an archetype for implementing a Hexagonal Architecture using FastAPI. It serves as a template for building scalable and maintainable web applications by adhering to the principles of Hexagonal Architecture, also known as Ports and Adapters architecture.
 
-## Project Structure
+# Documentación Técnica.
 
-The project is organized into several key modules:
+## Introducción
 
-1. **Domain**: Contains the core business logic, including use cases and domain models. This layer is independent of external frameworks and libraries.
+La calculadora del tiempo relativista es una herramienta que permite calcular la diferencia temporal entre dos cuerpos que viajan a diferentes velocidades durante un tiempo de referencia (el tiempo de viaje). El objetivo es mostrar cómo el tiempo propio de cada cuerpo varía según los postulados de la relatividad especial, en particular mediante el uso del factor de Lorentz.
 
-2. **Application**: This layer orchestrates the business logic by handling use cases and managing the flow of data between the domain and infrastructure layers. It includes handlers and application-level services.
+## Flujo del Proceso
 
-3. **Driven adapters**: Manages the interaction with external systems, such as databases, external APIs, and other services. This layer includes data persistence, API clients, and other integrations.
+### Frontend (Angular)
 
-4. **Entry Points**: The external interface of the application, including API endpoints defined using FastAPI. This layer handles HTTP requests and responses, interacting with the application layer to process business logic.
+1. El usuario ingresa:
+   - Velocidad del cuerpo 1.
+   - Velocidad del cuerpo 2.
+   - Tiempo de referencia (en segundos, desde el sistema inercial).
+2. El frontend estructura estos datos (convierte la velocidades a $$m/s$$) y realiza una solicitud HTTP `POST` al endpoint expuesto por el backend.
+3. Una vez obtenida la respuesta, muestra:
+   - El tiempo propio de cada cuerpo.
+   - La diferencia de tiempo entre ellos.
 
-## Key Features
+### Backend (FastAPI + Arquitectura Hexagonal)
 
-- **FastAPI Integration**: Utilizes FastAPI for creating robust and efficient APIs, benefiting from its automatic generation of OpenAPI and JSON schema documentation.
+1. **Entry Point (Adapter de API)**:
+   - Endpoint `POST time/time-comparision`.
+   - Recibe los datos como JSON.
+   - Valida el rango de velocidades (v < c).
+   - Convierte los datos al DTO de entrada.
 
-- **Dependency Injection**: Implements the `dependency_injector` library to manage dependencies, ensuring loose coupling between components and enhancing testability.
+2. **Use Case (Application Layer)**:
+   - Orquesta el flujo del cálculo.
+   - Aplica la fórmula de dilatación temporal:
 
-- **Custom Exception Handling**: Provides a structured approach for handling custom exceptions and error responses, improving the consistency and readability of the API.
+     $$
+     t' = t / sqrt(1 - v²/c²)
+     $$
 
-- **Data Transfer Objects (DTOs)**: Uses DTOs for structured data exchange between the client and the server, ensuring that only the necessary information is exposed.
+     donde:
+     - `t` es el tiempo de referencia.
+     - `v` es la velocidad relativa del cuerpo.
+     - `c` es la velocidad de la luz (constante).
+   - Calcula el tiempo propio para cada cuerpo.
+   - Calcula la diferencia entre los dos tiempos.
 
-## How to Use
+3. **Domain Layer**:
+   - Contiene la lógica pura de negocio: clase `RelativisticTimeCalculator`.
+   - Métodos:
+     - `calculate_proper_time(velocity: float, reference_time: float) -> float`
+     - `calculate_difference(time1: float, time2: float) -> float`
 
-1. **Setup**: Clone the repository and set up a virtual environment. Install the required dependencies using `pip`:
+4. **Response**:
+   - El resultado se estructura en un DTO de salida y se retorna al cliente.
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Cálculos y Fórmulas Utilizadas[^1]
 
-2. **Running the Application**: Start the FastAPI application using Uvicorn:
+- **Factor de Lorentz**:  
+$$
+  \gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}}
+$$
 
-   ```bash
-    uvicorn app.main:app --reload
-   ```
-3. **API Documentation**: Access the interactive API documentation at `http://127.0.0.1:8000/docs` for the OpenAPI interface, or at `http://127.0.0.1:8000/redoc` for the ReDoc interface. These endpoints provide a detailed view of the available API endpoints, request/response schemas, and other useful information.
+- **Tiempo propio**:  
+$$
+  t' = \frac{t}{\gamma}
+$$
 
-4. **Extending the Archetype**: The provided structure can be extended by adding new use cases, domain models, infrastructure services, and API endpoints as needed. The modular architecture makes it easy to add new functionality or modify existing components without affecting other parts of the system.
+- **Diferencia de tiempos**:  
+$$
+  \Delta t = |t'_1 - t'_2|
+$$
 
-## Contributing
 
-Contributions are welcome! If you have ideas for improving this archetype or find any issues, please feel free to submit a pull request or open an issue. We appreciate any feedback or suggestions to enhance the functionality and usability of this template.
+## Diagrama de Flujo del Cálculo
 
-## License
+```mermaid
+flowchart TD
+    Start([Inicio]) --> Input[Recibir velocidades y tiempo]
+    Input --> Validate[Validar entradas]
+    Validate --> Calc1[Calcular tiempo propio cuerpo 1]
+    Calc1 --> Calc2[Calcular tiempo propio cuerpo 2]
+    Calc2 --> Diff[Calcular diferencia temporal]
+    Diff --> Format[Formatear respuesta]
+    Format --> End([Fin])
+```
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+## Consideraciones
+
+- El sistema no contempla aceleraciones ni efectos gravitacionales (solo relatividad especial).
+- La velocidad de la luz se asume constante en el sistema de unidades elegido.
+- Puede ampliarse para incluir más cuerpos o representar visualmente las diferencias en una gráfica.
+
+## Posibles Extensiones Futuras
+
+- Soporte para efectos de relatividad general.
+- Comparación entre múltiples cuerpos.
+- Visualización gráfica de los tiempos en el frontend.
 
 ---
 
-This archetype aims to streamline the development process by providing a well-structured foundation based on Hexagonal Architecture principles. It is designed to be adaptable to various types of projects and requirements, ensuring a clean separation of concerns and ease of maintenance.
+
+
+## Repositorio y Código Fuente
+
+Todo el código fuente de este proyecto se encuentra disponible en GitHub. Para acceder a la implementación completa, incluyendo todos los detalles de configuración, puedes visitar el repositorio:
+
+[Time-Calculator: Back](https://github.com/sasanchezramirez/time-back)
+
+[Time-Calculator: Front](https://github.com/sasanchezramirez/time-front)
+
+
+## Ejemplos de Código Clave
+
+### Ejemplo 1: Cálculo del Tiempo Relativista (Domain)
+
+```python
+class RelativisticTimeCalculator:
+    SPEED_OF_LIGHT = 299792458  # m/s
+
+    def calculate_proper_time(self, velocity: float, reference_time: float) -> float:
+        """Calcula el tiempo propio de un cuerpo en movimiento."""
+        # Normalizar velocidad (v/c)
+        normalized_velocity = velocity / self.SPEED_OF_LIGHT
+        
+        # Factor de Lorentz
+        lorentz_factor = 1 / math.sqrt(1 - normalized_velocity**2)
+        
+        # Dilatación temporal
+        proper_time = reference_time / lorentz_factor
+        
+        return proper_time
+    
+    def calculate_time_difference(self, time1: float, time2: float) -> float:
+        """Calcula la diferencia absoluta entre dos tiempos propios."""
+        return abs(time1 - time2)
+```
+
+### Ejemplo 2: DTO para la Respuesta
+
+```python
+class TimeCalculationResponseDTO:
+    def __init__(
+        self,
+        proper_time_body1: float,
+        proper_time_body2: float,
+        time_difference: float
+    ):
+        self.proper_time_body1 = proper_time_body1
+        self.proper_time_body2 = proper_time_body2
+        self.time_difference = time_difference
+        
+    def to_dict(self):
+        return {
+            "proper_time_body1": self.proper_time_body1,
+            "proper_time_body2": self.proper_time_body2,
+            "time_difference": self.time_difference
+        }
+```
+
+## Implementación y Detalles Técnicos
+
+Para una comprensión completa de la implementación, se recomienda revisar el código fuente en el repositorio GitHub. Allí encontrarás:
+
+- Implementación completa del frontend en Angular
+- Código backend con arquitectura hexagonal
+- Instrucciones detalladas de instalación y configuración
+
+¿Tienes alguna sugerencia? Yo encantado de recibirla.
+
+---
+
